@@ -153,12 +153,12 @@
   const projects = [
     {
       index: "01",
-      meta: "B.Tech Project",
-      title: "Optimizing Federated Learning Performance using Swarm-Based Algorithms",
+      meta: "IEEE Paper",
+      title: "Swarm-Intelligence-Driven Model Aggregation for Accelerated Federated Learning",
       summary:
         "Implemented FedPSO & FedCPSO on Flower, cutting on-device memory by 70% and network communication by 49%.",
       description:
-        "Implemented two swarm-based federated learning algorithms—Google's FedPSO and FedCPSO—on the open-source Flower framework as part of my B.Tech project.",
+        "Implemented and optimized two swarm-based federated learning algorithms—Google's FedPSO and FedCPSO—on the open-source Flower framework.",
       highlights: [
         "Implemented FedPSO and FedCPSO on the Flower federated learning framework",
         "Optimized FedCPSO to achieve a 70% reduction in on-device memory usage",
@@ -184,14 +184,14 @@
     {
       index: "03",
       meta: "Micron India",
-      title: "TTE (Test to End) Pipeline",
+      title: "Distributed Cloud Data Processing & Batch Routing Pipeline",
       summary:
-        "Global chip-testing data pipeline processing 1M+ files daily with automated reprocessing and monitoring.",
+        "High-throughput cloud ingestion pipeline processing 1M+ daily semiconductor telemetry files with automated reprocessing and monitoring.",
       description:
-        "Micron's global chip-testing data collection system, processing over a million files daily to help engineers determine chip quality for shipping.",
+        "Micron's global semiconductor telemetry ingestion and processing platform, handling over a million files daily to support chip quality decisions for shipping.",
       highlights: [
         "Engineered a reprocessing pipeline cutting daily missing summaries from 3,000+ to under 100",
-        "Integrated a reusable Cloud Function standardizing batch routing to MFZ, TTE-Extractor, and AVRO",
+        "Integrated a reusable Cloud Function standardizing batch routing to downstream AVRO and extraction flows",
         "Built hourly Parquet monitoring that detected a GCP switchover failure early"
       ],
       tags: ["GKE", "Pub/Sub", "BigQuery", "Bigtable", "Bash"]
