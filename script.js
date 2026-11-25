@@ -350,4 +350,16 @@
       closePopupNow();
     }
   });
+
+  if (window.matchMedia("(pointer: fine)").matches) {
+    let glowRaf = null;
+    window.addEventListener("pointermove", (event) => {
+      if (glowRaf) return;
+      glowRaf = requestAnimationFrame(() => {
+        root.style.setProperty("--mx", `${event.clientX}px`);
+        root.style.setProperty("--my", `${event.clientY}px`);
+        glowRaf = null;
+      });
+    });
+  }
 })();
