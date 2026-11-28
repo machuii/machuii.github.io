@@ -13,6 +13,60 @@
 
   root.setAttribute("data-theme", initialTheme);
 
+  const welcomeEl = document.getElementById("welcome-screen");
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let welcomeFinished = false;
+  let glitchTimer = null;
+  let leaveTimer = null;
+
+  const revealPage = (immediate = false) => {
+    if (welcomeFinished) return;
+    welcomeFinished = true;
+    if (glitchTimer) {
+      clearTimeout(glitchTimer);
+      glitchTimer = null;
+    }
+    if (leaveTimer) {
+      clearTimeout(leaveTimer);
+      leaveTimer = null;
+    }
+
+    if (welcomeEl) {
+      welcomeEl.classList.remove("is-glitching");
+      welcomeEl.classList.add("is-leaving");
+    }
+
+    document.body.classList.remove("is-welcoming");
+    document.body.classList.add("is-entered");
+
+    if (welcomeEl) {
+      window.setTimeout(() => {
+        welcomeEl.remove();
+      }, immediate || prefersReducedMotion ? 0 : 650);
+    }
+  };
+
+  if (prefersReducedMotion || !welcomeEl) {
+    revealPage(true);
+  } else {
+    glitchTimer = window.setTimeout(() => {
+      if (welcomeFinished) return;
+      welcomeEl.classList.add("is-glitching");
+      leaveTimer = window.setTimeout(() => revealPage(false), 420);
+    }, 1080);
+
+    welcomeEl.addEventListener("click", () => revealPage(false));
+    window.addEventListener(
+      "keydown",
+      (e) => {
+        if (!welcomeFinished && (e.key === "Enter" || e.key === " " || e.key === "Escape")) {
+          revealPage(false);
+        }
+      },
+      { once: true }
+    );
+  }
+
   if (toggleBtn) {
     toggleBtn.addEventListener("click", () => {
       const current = root.getAttribute("data-theme") === "light" ? "light" : "dark";
@@ -362,4 +416,56 @@
       });
     });
   }
+
+  const secretDot = document.getElementById("secret-dot");
+  const easterEggNote = document.getElementById("easter-egg-note");
+  const easterEggClose = document.getElementById("easter-egg-close");
+  let dotClicks = 0;
+  let dotResetTimer = null;
+  let typedBuffer = "";
+
+  const showEasterEgg = () => {
+    if (!easterEggNote) return;
+    easterEggNote.classList.add("is-visible");
+    easterEggNote.setAttribute("aria-hidden", "false");
+  };
+
+  const hideEasterEgg = () => {
+    if (!easterEggNote) return;
+    easterEggNote.classList.remove("is-visible");
+    easterEggNote.setAttribute("aria-hidden", "true");
+  };
+
+  if (secretDot) {
+    secretDot.addEventListener("click", () => {
+      dotClicks += 1;
+      clearTimeout(dotResetTimer);
+      if (dotClicks >= 3) {
+        dotClicks = 0;
+        showEasterEgg();
+        return;
+      }
+      dotResetTimer = setTimeout(() => {
+        dotClicks = 0;
+      }, 1200);
+    });
+  }
+
+  if (easterEggClose) {
+    easterEggClose.addEventListener("click", hideEasterEgg);
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      hideEasterEgg();
+      return;
+    }
+    if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      typedBuffer = (typedBuffer + event.key.toLowerCase()).slice(-8);
+      if (typedBuffer === "infinity") {
+        typedBuffer = "";
+        showEasterEgg();
+      }
+    }
+  });
 })();

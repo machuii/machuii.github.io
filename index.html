@@ -18,7 +18,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body class="is-welcoming">
+  <div id="welcome-screen" class="welcome-screen" aria-hidden="true">
+    <div class="welcome-inner">
+      <p class="welcome-title" data-text="Welcome.">Welcome<span class="welcome-dot">.</span></p>
+      <div class="welcome-bar"><span class="welcome-bar-fill"></span></div>
+    </div>
+  </div>
+
   <div class="bg-grid" aria-hidden="true"></div>
   <div class="bg-tech" id="bg-tech" aria-hidden="true"></div>
   <div class="bg-glow" aria-hidden="true"></div>
@@ -47,7 +54,7 @@
     <section class="hero" aria-labelledby="hero-name">
       <p class="hero-greeting">Hi, my name is</p>
 
-      <h1 id="hero-name" class="hero-name">Mathew Bino.</h1>
+      <h1 id="hero-name" class="hero-name">Mathew Bino<span id="secret-dot" class="secret-dot">.</span></h1>
 
       <p class="hero-intro">
         I am a Data &amp; Backend Engineer at <strong>Micron India</strong> (SMAI), building scalable cloud data pipelines and backend systems that process billions of manufacturing records daily.
@@ -167,6 +174,20 @@
       <div id="popup-links" class="popup-links"></div>
     </article>
   </div>
+
+  <aside id="easter-egg-note" class="easter-egg-note" role="status" aria-live="polite" aria-hidden="true">
+    <div class="easter-egg-top">
+      <span class="easter-egg-tag">// hidden note</span>
+      <button id="easter-egg-close" class="easter-egg-close" type="button" aria-label="Close hidden note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    <p class="easter-egg-text">
+      We're already friends if you agree Infinity War was the greatest cinematic experience of all time.
+    </p>
+  </aside>
 
   <footer class="site-footer">
     <div class="container footer-inner">

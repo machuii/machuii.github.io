@@ -223,7 +223,171 @@ body {
 
 .hero {
   width: 100%;
-  animation: fadeUp 0.55s ease-out both;
+}
+
+/* Welcome Screen & Page Entrance */
+.welcome-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  cursor: pointer;
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0.65s;
+}
+
+.welcome-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(560px circle at 50% 48%, var(--accent-glow), transparent 68%);
+  pointer-events: none;
+}
+
+.welcome-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 1.5rem;
+}
+
+.welcome-title {
+  position: relative;
+  margin: 0;
+  font-size: clamp(2.1rem, 5.5vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--text);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.12s forwards;
+}
+
+.welcome-title::before,
+.welcome-title::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.welcome-dot {
+  color: var(--accent);
+}
+
+.welcome-bar {
+  width: 8.5rem;
+  height: 2px;
+  margin-top: 1.25rem;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeUp 0.4s ease 0.25s forwards;
+}
+
+.welcome-bar-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  animation: welcomeProgress 0.85s cubic-bezier(0.4, 0, 0.2, 1) 0.28s forwards;
+}
+
+.welcome-screen.is-glitching {
+  animation: welcomeScreenGlitch 0.42s steps(2, end) forwards;
+}
+
+.welcome-screen.is-glitching::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 3px,
+    rgba(56, 189, 248, 0.08) 3px 4px
+  );
+  pointer-events: none;
+  animation: glitchScan 0.42s steps(2, end) forwards;
+}
+
+.welcome-screen.is-glitching .welcome-title {
+  opacity: 1;
+  animation: glitchTextMain 0.42s steps(2, end) forwards;
+}
+
+.welcome-screen.is-glitching .welcome-title::before {
+  color: var(--accent);
+  opacity: 0.9;
+  animation: glitchSliceA 0.42s steps(2, end) forwards;
+}
+
+.welcome-screen.is-glitching .welcome-title::after {
+  color: #f43f5e;
+  opacity: 0.85;
+  animation: glitchSliceB 0.42s steps(2, end) forwards;
+}
+
+.welcome-screen.is-glitching .welcome-bar {
+  opacity: 1;
+  animation: glitchBar 0.38s steps(2, end) forwards;
+}
+
+.welcome-screen.is-leaving {
+  opacity: 0;
+  transform: scale(1.02);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+body.is-welcoming .site-header,
+body.is-welcoming .hero,
+body.is-welcoming .projects-section,
+body.is-welcoming .contact-section,
+body.is-welcoming .site-footer {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+body.is-entered .site-header,
+body.is-entered .hero,
+body.is-entered .projects-section,
+body.is-entered .contact-section,
+body.is-entered .site-footer {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+body.is-entered .site-header {
+  transition-delay: 0.04s;
+}
+
+body.is-entered .hero {
+  transition-delay: 0.1s;
+}
+
+body.is-entered .projects-section {
+  transition-delay: 0.22s;
+}
+
+body.is-entered .contact-section {
+  transition-delay: 0.32s;
+}
+
+body.is-entered .site-footer {
+  transition-delay: 0.38s;
 }
 
 .hero-greeting {
@@ -398,7 +562,6 @@ body {
 .projects-section {
   width: min(980px, calc(100vw - 3rem));
   align-self: center;
-  animation: fadeUp 0.65s ease-out both;
 }
 
 .projects-track {
@@ -667,6 +830,91 @@ body {
   color: var(--accent);
 }
 
+/* Easter Egg */
+.secret-dot {
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.secret-dot:hover {
+  color: var(--accent);
+}
+
+.easter-egg-note {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 45;
+  width: min(23rem, calc(100vw - 2.5rem));
+  padding: 1rem 1.15rem;
+  border-radius: 0.95rem;
+  border: 1px solid var(--border-hover);
+  background: var(--surface-solid);
+  box-shadow: 0 20px 45px rgba(2, 6, 23, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(12px) scale(0.98);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0.25s;
+}
+
+.easter-egg-note.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.easter-egg-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.45rem;
+}
+
+.easter-egg-tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+
+.easter-egg-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 0.45rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.easter-egg-close:hover {
+  color: var(--text);
+  border-color: var(--border-hover);
+}
+
+.easter-egg-close svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.easter-egg-text {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text);
+}
+
 /* Footer */
 .site-footer {
   padding: 1.5rem 0 2rem;
@@ -688,9 +936,139 @@ body {
   }
 }
 
+@keyframes welcomeProgress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes welcomeScreenGlitch {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  20% {
+    opacity: 0.95;
+    transform: translate(-3px, 1px) skewX(-2deg);
+  }
+  40% {
+    opacity: 0.85;
+    transform: translate(4px, -2px) skewX(3deg);
+  }
+  60% {
+    opacity: 0.9;
+    transform: translate(-5px, 0) scale(1.01);
+  }
+  80% {
+    opacity: 0.45;
+    transform: translate(3px, 2px) skewX(-4deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes glitchScan {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes glitchTextMain {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-4px, 1px) skewX(-6deg);
+  }
+  50% {
+    transform: translate(5px, -2px) skewX(5deg);
+  }
+  75% {
+    transform: translate(-3px, 0) scaleX(1.04);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(0, -6px);
+    opacity: 0;
+  }
+}
+
+@keyframes glitchSliceA {
+  0% {
+    clip-path: inset(10% 0 65% 0);
+    transform: translate(-6px, 0);
+  }
+  33% {
+    clip-path: inset(48% 0 22% 0);
+    transform: translate(7px, -2px);
+  }
+  66% {
+    clip-path: inset(72% 0 6% 0);
+    transform: translate(-5px, 2px);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    opacity: 0;
+  }
+}
+
+@keyframes glitchSliceB {
+  0% {
+    clip-path: inset(60% 0 12% 0);
+    transform: translate(6px, 1px);
+  }
+  33% {
+    clip-path: inset(18% 0 58% 0);
+    transform: translate(-7px, 2px);
+  }
+  66% {
+    clip-path: inset(38% 0 36% 0);
+    transform: translate(5px, -1px);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    opacity: 0;
+  }
+}
+
+@keyframes glitchBar {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  40% {
+    transform: translateX(-10px) scaleX(1.12);
+    opacity: 0.7;
+  }
+  80% {
+    transform: translateX(8px) scaleX(0.85);
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero,
-  .projects-section {
+  .projects-section,
+  .welcome-title,
+  .welcome-bar,
+  .welcome-bar-fill {
     animation: none;
   }
 
@@ -700,6 +1078,12 @@ body {
   .project-card,
   .project-popup-backdrop,
   .project-popup,
+  .welcome-screen,
+  body.is-entered .site-header,
+  body.is-entered .hero,
+  body.is-entered .projects-section,
+  body.is-entered .contact-section,
+  body.is-entered .site-footer,
   body {
     transition: none;
   }
