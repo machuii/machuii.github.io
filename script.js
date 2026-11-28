@@ -249,10 +249,58 @@
         "Built hourly Parquet monitoring that detected a GCP switchover failure early"
       ],
       tags: ["GKE", "Pub/Sub", "BigQuery", "Bigtable", "Bash"]
+    },
+    {
+      index: "04",
+      meta: "Micron India",
+      title: "Large-Scale Semiconductor Test History Backfill",
+      summary:
+        "Rebuilt a year of die, wafer, and package diagnostics in BigQuery with 1.5 TB Spark deduplication and 13B-row migration.",
+      description:
+        "End-to-end historical backfill and warehouse migration pipeline rebuilding a full year of semiconductor test diagnostics in BigQuery.",
+      highlights: [
+        "Cut a PySpark/Dataproc ETL job from 161 to 75 minutes wall-clock by eliminating memory spill and doubling peak concurrency",
+        "Delivered a 1.5 TB global deduplication in a single 6-hour Spark job",
+        "Migrated Snowflake historical tables to BigQuery, landing 13 billion rows in 2 hours"
+      ],
+      tags: ["PySpark", "Dataproc", "BigQuery", "Snowflake", "GCS"]
+    },
+    {
+      index: "05",
+      meta: "Systems Project",
+      title: "eXpOS — Multi-Core Operating System from Scratch",
+      summary:
+        "Built a full-featured OS with process synchronization, semaphores, paging, interrupts, file systems, and multi-core support.",
+      description:
+        "Designed and implemented an experimental operating system from the ground up, covering kernel internals, memory virtualization, and multi-core scheduling.",
+      highlights: [
+        "Implemented process synchronization, semaphores, and multi-user management from scratch",
+        "Built virtual memory paging, interrupt handling, and multi-core execution support",
+        "Engineered a complete file management subsystem and low-level kernel routines"
+      ],
+      tags: ["OS Internals", "Paging", "Multi-Core", "Synchronization"]
+    },
+    {
+      index: "06",
+      meta: "Compiler Design",
+      title: "Simple Programming Language & Compiler",
+      summary:
+        "Designed and built a statically typed language and compiler from scratch using Lex, Yacc, and C with OOP features.",
+      description:
+        "Created an end-to-end programming language specification and compiler from scratch using Lex, Yacc, and C.",
+      highlights: [
+        "Built lexical analyzer, grammar rules, and AST/code generation using Lex, Yacc, and C",
+        "Implemented user-defined types, functions, inheritance, and subtype polymorphism",
+        "Applied formal language theory and compiler design principles end-to-end"
+      ],
+      tags: ["C", "Lex", "Yacc", "Compilers"]
     }
   ];
 
   const projectsTrack = document.getElementById("projects-track");
+  const deckPrevBtn = document.getElementById("deck-prev");
+  const deckNextBtn = document.getElementById("deck-next");
+  const deckDotsEl = document.getElementById("deck-dots");
   const popupBackdrop = document.getElementById("project-popup-backdrop");
   const popupEl = document.getElementById("project-popup");
   const popupMeta = document.getElementById("popup-meta");
@@ -310,8 +358,12 @@
       popupLinks.appendChild(a);
     });
 
-    popupBackdrop.classList.add("is-open");
     popupBackdrop.setAttribute("aria-hidden", "false");
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        popupBackdrop.classList.add("is-open");
+      });
+    });
   };
 
   const scheduleOpenPopup = (project) => {
@@ -319,7 +371,7 @@
     clearTimeout(closeTimer);
     openTimer = setTimeout(() => {
       openPopup(project);
-    }, 400);
+    }, 500);
   };
 
   const cancelPendingOpen = () => {
@@ -348,8 +400,39 @@
     hasEnteredPopup = false;
   };
 
+  let activeDeckIndex = 1;
+  const deckCards = [];
+  const deckDots = [];
+
+  const getDeckOffset = (index, active, total) => {
+    let diff = (index - active + total) % total;
+    if (diff > total / 2) diff -= total;
+    return diff;
+  };
+
+  const updateDeckPositions = () => {
+    const total = projects.length;
+    deckCards.forEach((card, idx) => {
+      const offset = getDeckOffset(idx, activeDeckIndex, total);
+      card.dataset.offset = String(offset);
+      card.setAttribute("aria-current", offset === 0 ? "true" : "false");
+    });
+    deckDots.forEach((dot, idx) => {
+      const isCurrent = idx === activeDeckIndex;
+      dot.classList.toggle("is-active", isCurrent);
+      dot.setAttribute("aria-selected", String(isCurrent));
+    });
+  };
+
+  const setActiveDeck = (nextIndex) => {
+    clearTimeout(openTimer);
+    const total = projects.length;
+    activeDeckIndex = ((nextIndex % total) + total) % total;
+    updateDeckPositions();
+  };
+
   if (projectsTrack) {
-    projects.forEach((project) => {
+    projects.forEach((project, idx) => {
       const card = document.createElement("button");
       card.type = "button";
       card.className = "project-card";
@@ -367,12 +450,46 @@
         <div class="project-tags">${previewTags}</div>
       `;
 
-      card.addEventListener("mouseenter", () => scheduleOpenPopup(project));
+      card.addEventListener("mouseenter", () => {
+        const offset = Number(card.dataset.offset);
+        if (Math.abs(offset) <= 1) {
+          scheduleOpenPopup(project);
+        }
+      });
       card.addEventListener("mouseleave", cancelPendingOpen);
-      card.addEventListener("click", () => openPopup(project));
+      card.addEventListener("click", () => {
+        const offset = Number(card.dataset.offset);
+        if (offset === 0) {
+          openPopup(project);
+        } else {
+          setActiveDeck(idx);
+        }
+      });
 
       projectsTrack.appendChild(card);
+      deckCards.push(card);
+
+      if (deckDotsEl) {
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "deck-dot";
+        dot.setAttribute("role", "tab");
+        dot.setAttribute("aria-label", `Show project ${idx + 1}: ${project.title}`);
+        dot.addEventListener("click", () => setActiveDeck(idx));
+        deckDotsEl.appendChild(dot);
+        deckDots.push(dot);
+      }
     });
+
+    updateDeckPositions();
+  }
+
+  if (deckPrevBtn) {
+    deckPrevBtn.addEventListener("click", () => setActiveDeck(activeDeckIndex - 1));
+  }
+
+  if (deckNextBtn) {
+    deckNextBtn.addEventListener("click", () => setActiveDeck(activeDeckIndex + 1));
   }
 
   if (popupEl) {
@@ -402,6 +519,12 @@
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       closePopupNow();
+      return;
+    }
+    if (!isPopupOpen() && event.key === "ArrowLeft") {
+      setActiveDeck(activeDeckIndex - 1);
+    } else if (!isPopupOpen() && event.key === "ArrowRight") {
+      setActiveDeck(activeDeckIndex + 1);
     }
   });
 
@@ -420,8 +543,6 @@
   const secretDot = document.getElementById("secret-dot");
   const easterEggNote = document.getElementById("easter-egg-note");
   const easterEggClose = document.getElementById("easter-egg-close");
-  let dotClicks = 0;
-  let dotResetTimer = null;
   let typedBuffer = "";
 
   const showEasterEgg = () => {
@@ -437,18 +558,7 @@
   };
 
   if (secretDot) {
-    secretDot.addEventListener("click", () => {
-      dotClicks += 1;
-      clearTimeout(dotResetTimer);
-      if (dotClicks >= 3) {
-        dotClicks = 0;
-        showEasterEgg();
-        return;
-      }
-      dotResetTimer = setTimeout(() => {
-        dotClicks = 0;
-      }, 1200);
-    });
+    secretDot.addEventListener("click", showEasterEgg);
   }
 
   if (easterEggClose) {
